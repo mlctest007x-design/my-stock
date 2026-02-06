@@ -3,122 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frost Stock Pro - Ultimate Edition</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <title>Frost Stock Pro - Edit Enabled</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --available: #2dd4bf; --unavailable: #fb7185;
-            --primary: #6366f1; --glass: rgba(255, 255, 255, 0.75);
-            --glass-heavy: rgba(255, 255, 255, 0.9);
+            --primary: #6366f1; --glass: rgba(255, 255, 255, 0.8);
         }
-
-        * { box-sizing: border-box; transition: all 0.2s ease; }
-        
+        * { box-sizing: border-box; font-family: 'Sarabun', sans-serif; transition: all 0.2s; }
         body { 
-            font-family: 'Sarabun', sans-serif; margin: 0; min-height: 100vh;
+            margin: 0; min-height: 100vh;
             background: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070') no-repeat center center fixed;
             background-size: cover; display: flex; justify-content: center;
         }
-
-        /* Utility Classes */
-        .glass-card { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.4); border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .glass-card { background: var(--glass); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
         
-        #loginPage { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
-        .login-card { background: white; padding: 40px; border-radius: 30px; width: 380px; text-align: center; }
+        #loginPage { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-card { background: white; padding: 40px; border-radius: 25px; width: 350px; text-align: center; }
 
-        #mainSystem { display: none; width: 100%; max-width: 1200px; padding: 30px 15px; }
-
-        /* Dashboard Stats */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-item { padding: 20px; text-align: center; }
-        .stat-item h4 { margin: 0; color: #64748b; font-size: 14px; }
-        .stat-item p { margin: 5px 0 0; font-size: 24px; font-weight: 600; color: var(--primary); }
-
-        /* Form & Search */
-        .control-panel { padding: 25px; margin-bottom: 25px; }
-        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: end; }
+        #mainSystem { display: none; width: 100%; max-width: 1100px; padding: 20px; }
         
-        input, select { padding: 10px 15px; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; outline: none; background: white; width: 100%; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
-
-        .btn { padding: 10px 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .control-panel { padding: 20px; margin-bottom: 20px; }
+        .grid-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; align-items: end; }
+        
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 10px; outline: none; width: 100%; font-size: 14px; }
+        .btn { padding: 10px 15px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
         .btn-primary { background: var(--primary); color: white; }
-        .btn-secondary { background: white; color: #475569; border: 1px solid #e2e8f0; }
-        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .btn-secondary { background: #f1f5f9; color: #475569; }
 
-        /* Table */
-        .table-container { overflow-x: auto; padding: 10px; }
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; color: #64748b; font-size: 13px; border-bottom: 2px solid #f1f5f9; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; background: rgba(255,255,255,0.3); }
-        tr:hover td { background: rgba(255,255,255,0.6); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; padding: 12px; font-size: 13px; color: #64748b; border-bottom: 2px solid #eee; }
+        td { padding: 12px; border-bottom: 1px solid #eee; background: rgba(255,255,255,0.2); }
+        .clickable-row { cursor: pointer; }
+        .clickable-row:hover td { background: rgba(255,255,255,0.5); }
 
-        .item-img { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; border: 2px solid white; cursor: zoom-in; }
-        .badge { padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: 600; }
-
-        /* Modal */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 1000; }
-        .modal { background: white; padding: 30px; border-radius: 20px; width: 400px; max-width: 90%; }
+        .item-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1000; }
+        .modal { background: white; padding: 25px; border-radius: 20px; width: 400px; }
     </style>
 </head>
 <body>
 
 <div id="loginPage">
     <div class="login-card">
-        <h2>❄️ Frost Stock Pro</h2>
+        <h2>❄️ Frost Stock</h2>
         <input type="text" id="username" placeholder="Username" style="margin-bottom:10px;">
         <input type="password" id="password" placeholder="Password" style="margin-bottom:20px;">
-        <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%;">เข้าสู่ระบบ</button>
+        <button class="btn btn-primary" onclick="handleLogin()" style="width: 100%;">Login as Admin</button>
     </div>
 </div>
 
 <div id="mainSystem">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px;">
-        <h1 style="margin:0; color:white; text-shadow: 0 2px 10px rgba(0,0,0,0.2);">Inventory Dashboard</h1>
-        <div style="display:flex; gap:8px;">
-            <button class="btn btn-secondary" onclick="exportToExcel()">📊 ส่งออก Excel</button>
-            <button class="btn btn-secondary" onclick="backupData()">💾 Backup</button>
-            <button class="btn btn-secondary" style="color:#fb7185" onclick="location.reload()">🔒 ออก</button>
-        </div>
-    </div>
-
-    <div class="stats-grid">
-        <div class="glass-card stat-item"><h4>ทั้งหมด</h4><p id="statTotal">0</p></div>
-        <div class="glass-card stat-item"><h4>พร้อมใช้งาน</h4><p id="statAvailable" style="color:#2dd4bf">0</p></div>
-        <div class="glass-card stat-item"><h4>สินค้าหมด</h4><p id="statOut" style="color:#fb7185">0</p></div>
-        <div class="glass-card stat-item"><h4>ไซต์งาน</h4><p id="statSites">0</p></div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px; align-items:center;">
+        <h2 style="color:white; margin:0;">Stock Management</h2>
+        <button class="btn btn-secondary" onclick="location.reload()">Logout</button>
     </div>
 
     <div class="glass-card control-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #eee; padding-bottom:15px;">
-            <div style="display:flex; gap:10px; flex:1;">
-                <input type="text" id="searchInp" placeholder="🔍 ค้นหาชื่อหรือรหัส..." oninput="render()" style="max-width:300px;">
-                <select id="filterType" onchange="render()" style="max-width:150px;"></select>
-            </div>
-            <div style="display:flex; gap:8px;">
-                <button class="btn btn-secondary" onclick="openManager('site')">🏗️ ไซต์</button>
-                <button class="btn btn-secondary" onclick="openManager('type')">🏷️ ประเภท</button>
-            </div>
-        </div>
-
         <div class="grid-form">
-            <div><label style="font-size:11px; font-weight:600;">รหัสสินค้า</label><input type="text" id="tCode"></div>
-            <div><label style="font-size:11px; font-weight:600;">ชื่อสินค้า</label><input type="text" id="tName"></div>
-            <div><label style="font-size:11px; font-weight:600;">ประเภท</label><select id="tTypeSelect"></select></div>
-            <div><label style="font-size:11px; font-weight:600;">รูป</label><input type="file" id="tImg" accept="image/*"></div>
-            <div><label style="font-size:11px; font-weight:600;">จำนวน</label><input type="number" id="tQty" value="1"></div>
-            <button class="btn btn-primary" onclick="addItem()">+ เพิ่มสินค้า</button>
+            <div>รหัส<input type="text" id="tCode"></div>
+            <div>ชื่อสินค้า<input type="text" id="tName"></div>
+            <div>ประเภท<select id="tTypeSelect"></select></div>
+            <div>จำนวน<input type="number" id="tQty" value="1"></div>
+            <button class="btn btn-primary" onclick="addItem()">+ เพิ่มใหม่</button>
         </div>
     </div>
 
-    <div class="glass-card table-container">
+    <div class="glass-card" style="padding:15px; overflow-x:auto;">
         <table>
             <thead>
                 <tr>
-                    <th>รูป</th>
-                    <th>สินค้า</th>
+                    <th>รหัส</th>
+                    <th>ชื่อสินค้า</th>
                     <th>ประเภท</th>
-                    <th>สถานะ</th>
                     <th>คงเหลือ</th>
                     <th style="text-align:right;">จัดการ</th>
                 </tr>
@@ -126,187 +83,99 @@
             <tbody id="toolTable"></tbody>
         </table>
     </div>
-
-    <div class="glass-card" style="margin-top:25px; padding:25px;">
-        <h3 style="margin-top:0;">📜 ประวัติกิจกรรม</h3>
-        <div id="logBox" style="max-height:200px; overflow-y:auto; font-size:13px;"></div>
-    </div>
 </div>
 
-<div id="actionModal" class="modal-overlay">
+<div id="editModal" class="modal-overlay">
     <div class="modal">
-        <h3 id="actTitle">เบิก/คืน</h3>
-        <input type="text" id="mUser" placeholder="ชื่อผู้ทำรายการ" style="margin-bottom:10px;">
-        <select id="mSite" style="margin-bottom:20px;"></select>
+        <h3>แก้ไขข้อมูลสินค้า</h3>
+        <input type="hidden" id="editUid">
+        <label style="font-size:12px;">รหัสสินค้า</label>
+        <input type="text" id="editCode" style="margin-bottom:10px;">
+        <label style="font-size:12px;">ชื่อสินค้า</label>
+        <input type="text" id="editName" style="margin-bottom:10px;">
+        <label style="font-size:12px;">ประเภท</label>
+        <select id="editType" style="margin-bottom:15px;"></select>
         <div style="display:flex; gap:10px;">
-            <button class="btn btn-secondary" style="flex:1" onclick="closeModal('actionModal')">ยกเลิก</button>
-            <button id="confirmBtn" class="btn btn-primary" style="flex:1">ตกลง</button>
+            <button class="btn btn-secondary" style="flex:1" onclick="closeModal('editModal')">ยกเลิก</button>
+            <button class="btn btn-primary" style="flex:1" onclick="saveEdit()">บันทึกการแก้ไข</button>
         </div>
-    </div>
-</div>
-
-<div id="listModal" class="modal-overlay">
-    <div class="modal">
-        <h3 id="listTitle">จัดการ</h3>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="text" id="listInp" placeholder="ชื่อรายการใหม่">
-            <button class="btn btn-primary" onclick="addToList()">เพิ่ม</button>
-        </div>
-        <div id="listContent" style="max-height:200px; overflow-y:auto;"></div>
-        <button class="btn btn-secondary" style="width:100%; margin-top:15px;" onclick="closeModal('listModal')">ปิด</button>
     </div>
 </div>
 
 <script>
-    let tools = JSON.parse(localStorage.getItem('frost_v7_tools')) || [];
-    let logs = JSON.parse(localStorage.getItem('frost_v7_logs')) || [];
-    let sites = JSON.parse(localStorage.getItem('frost_v7_sites')) || ['สำนักงานใหญ่'];
-    let types = JSON.parse(localStorage.getItem('frost_v7_types')) || ['เครื่องมือไฟฟ้า', 'วัสดุทั่วไป'];
-    let curMode = '';
+    let tools = JSON.parse(localStorage.getItem('frost_v8_data')) || [];
+    let types = JSON.parse(localStorage.getItem('frost_v8_types')) || ['เครื่องมือไฟฟ้า', 'วัสดุก่อสร้าง', 'ทั่วไป'];
 
     function handleLogin() {
         if(document.getElementById('username').value==='admin' && document.getElementById('password').value==='1234') {
             document.getElementById('loginPage').style.display='none';
             document.getElementById('mainSystem').style.display='block';
-            updateUI(); render();
-        }
+            render();
+        } else { alert('รหัสผ่านไม่ถูกต้อง'); }
     }
 
-    async function addItem() {
+    function addItem() {
         const id = document.getElementById('tCode').value;
         const name = document.getElementById('tName').value;
         const type = document.getElementById('tTypeSelect').value;
         const qty = parseInt(document.getElementById('tQty').value);
-        const f = document.getElementById('tImg').files[0];
-        const img = f ? await toBase64(f) : '';
-
         if(id && name) {
-            tools.push({ uid: Date.now(), id, name, type, qty, img });
+            tools.push({ uid: Date.now(), id, name, type, qty });
             save(); clearForm();
         }
     }
 
     function render() {
-        const search = document.getElementById('searchInp').value.toLowerCase();
-        const filter = document.getElementById('filterType').value;
-        const table = document.getElementById('toolTable');
+        document.getElementById('tTypeSelect').innerHTML = types.map(t => `<option value="${t}">${t}</option>`).join('');
+        document.getElementById('editType').innerHTML = types.map(t => `<option value="${t}">${t}</option>`).join('');
         
-        const filtered = tools.filter(t => 
-            (t.name.toLowerCase().includes(search) || t.id.toLowerCase().includes(search)) &&
-            (filter === 'all' || t.type === filter)
-        );
-
-        table.innerHTML = filtered.map(t => `
-            <tr>
-                <td>${t.img ? `<img src="${t.img}" class="item-img" onclick="window.open(this.src)">` : '📦'}</td>
-                <td><b>${t.id}</b><br><small>${t.name}</small></td>
-                <td><span class="badge" style="background:#eef2ff; color:#6366f1;">${t.type}</span></td>
-                <td><span style="color:${t.qty>0?'#2dd4bf':'#fb7185'}">● ${t.qty>0?'พร้อม':'หมด'}</span></td>
-                <td><b>${t.qty}</b></td>
+        const table = document.getElementById('toolTable');
+        table.innerHTML = tools.map(t => `
+            <tr class="clickable-row">
+                <td onclick="openEdit(${t.uid})"><b>${t.id}</b></td>
+                <td onclick="openEdit(${t.uid})">${t.name}</td>
+                <td><small>${t.type}</small></td>
+                <td><b style="color:${t.qty>0?'#2dd4bf':'#fb7185'}">${t.qty}</b></td>
                 <td style="text-align:right;">
-                    <button class="btn btn-secondary" style="padding:5px 10px" onclick="openAction(${t.uid}, -1)">เบิก</button>
-                    <button class="btn btn-secondary" style="padding:5px 10px; color:#10b981" onclick="openAction(${t.uid}, 1)">คืน</button>
-                    <button class="btn btn-secondary" style="padding:5px 10px; color:#fb7185" onclick="deleteItem(${t.uid})">🗑️</button>
+                    <button class="btn btn-secondary" style="padding:5px" onclick="updateQty(${t.uid}, 1)">+</button>
+                    <button class="btn btn-secondary" style="padding:5px" onclick="updateQty(${t.uid}, -1)">-</button>
+                    <button class="btn btn-secondary" style="padding:5px; color:red;" onclick="deleteItem(${t.uid})">🗑️</button>
                 </td>
             </tr>`).join('');
-        
-        updateStats(filtered.length);
     }
 
-    function updateStats(filteredCount) {
-        document.getElementById('statTotal').innerText = tools.length;
-        document.getElementById('statAvailable').innerText = tools.filter(t => t.qty > 0).length;
-        document.getElementById('statOut').innerText = tools.filter(t => t.qty <= 0).length;
-        document.getElementById('statSites').innerText = sites.length;
-        
-        document.getElementById('logBox').innerHTML = logs.map(l => `
-            <div style="padding:8px 0; border-bottom:1px solid #f1f5f9;">
-                <span style="color:#94a3b8">${l.date}</span> | <b>${l.act}</b> ${l.name} โดย ${l.user} (${l.site})
-            </div>`).join('') || 'ไม่มีประวัติ';
-    }
-
-    function openAction(uid, delta) {
+    function openEdit(uid) {
         const t = tools.find(x => x.uid === uid);
-        if(delta < 0 && t.qty <= 0) return alert('ของหมด!');
-        document.getElementById('mSite').innerHTML = sites.map(s => `<option value="${s}">${s}</option>`).join('');
-        document.getElementById('actionModal').style.display = 'flex';
-        document.getElementById('actTitle').innerText = delta > 0 ? 'คืน: ' + t.name : 'เบิก: ' + t.name;
-        document.getElementById('confirmBtn').onclick = () => {
-            t.qty += delta;
-            logs.unshift({ date: new Date().toLocaleString(), act: delta>0?'คืน':'เบิก', name: t.name, user: document.getElementById('mUser').value || 'Unknown', site: document.getElementById('mSite').value });
-            if(logs.length > 50) logs.pop();
-            save(); closeModal('actionModal');
-        };
+        document.getElementById('editUid').value = t.uid;
+        document.getElementById('editCode').value = t.id;
+        document.getElementById('editName').value = t.name;
+        document.getElementById('editType').value = t.type;
+        document.getElementById('editModal').style.display = 'flex';
     }
 
-    function exportToExcel() {
-        let csv = 'รหัส,ชื่อ,ประเภท,จำนวน\n';
-        tools.forEach(t => csv += `${t.id},${t.name},${t.type},${t.qty}\n`);
-        const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "stock_report.csv";
-        link.click();
+    function saveEdit() {
+        const uid = parseInt(document.getElementById('editUid').value);
+        const t = tools.find(x => x.uid === uid);
+        t.id = document.getElementById('editCode').value;
+        t.name = document.getElementById('editName').value;
+        t.type = document.getElementById('editType').value;
+        save(); closeModal('editModal');
     }
 
-    function backupData() {
-        const data = JSON.stringify({ tools, sites, types, logs });
-        const blob = new Blob([data], { type: 'application/json' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `backup_${new Date().toLocaleDateString()}.json`;
-        link.click();
+    function updateQty(uid, delta) {
+        const t = tools.find(x => x.uid === uid);
+        if(t.qty + delta >= 0) { t.qty += delta; save(); }
     }
-
-    function openManager(mode) {
-        curMode = mode;
-        document.getElementById('listTitle').innerText = mode === 'site' ? 'จัดการไซต์งาน' : 'จัดการประเภทสินค้า';
-        document.getElementById('listModal').style.display = 'flex';
-        renderList();
-    }
-
-    function renderList() {
-        const arr = curMode === 'site' ? sites : types;
-        document.getElementById('listContent').innerHTML = arr.map((x, i) => `
-            <div style="display:flex; justify-content:space-between; padding:10px; background:#f8fafc; margin-bottom:5px; border-radius:10px;">
-                ${x} <button onclick="removeList(${i})" style="border:none; color:red; cursor:pointer;">✕</button>
-            </div>`).join('');
-    }
-
-    function addToList() {
-        const val = document.getElementById('listInp').value;
-        if(!val) return;
-        if(curMode === 'site') sites.push(val); else types.push(val);
-        document.getElementById('listInp').value = '';
-        save(); renderList(); updateUI();
-    }
-
-    function removeList(i) {
-        if(curMode === 'site') sites.splice(i, 1); else types.splice(i, 1);
-        save(); renderList(); updateUI();
-    }
-
-    function updateUI() {
-        document.getElementById('tTypeSelect').innerHTML = types.map(t => `<option value="${t}">${t}</option>`).join('');
-        document.getElementById('filterType').innerHTML = '<option value="all">ทุกประเภท</option>' + types.map(t => `<option value="${t}">${t}</option>`).join('');
-    }
-
-    const toBase64 = file => new Promise((r, j) => {
-        const reader = new FileReader(); reader.readAsDataURL(file);
-        reader.onload = () => r(reader.result);
-    });
 
     function save() {
-        localStorage.setItem('frost_v7_tools', JSON.stringify(tools));
-        localStorage.setItem('frost_v7_logs', JSON.stringify(logs));
-        localStorage.setItem('frost_v7_sites', JSON.stringify(sites));
-        localStorage.setItem('frost_v7_types', JSON.stringify(types));
+        localStorage.setItem('frost_v8_data', JSON.stringify(tools));
+        localStorage.setItem('frost_v8_types', JSON.stringify(types));
         render();
     }
 
-    function deleteItem(uid) { if(confirm('ลบรายการนี้?')) { tools = tools.filter(x => x.uid !== uid); save(); } }
+    function deleteItem(uid) { if(confirm('ยืนยันการลบ?')) { tools = tools.filter(x => x.uid !== uid); save(); } }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    function clearForm() { ['tCode','tName','tImg'].forEach(id => document.getElementById(id).value = ''); document.getElementById('tQty').value = 1; }
+    function clearForm() { document.getElementById('tCode').value=''; document.getElementById('tName').value=''; }
 </script>
 </body>
 </html>
