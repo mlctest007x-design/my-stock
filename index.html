@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frost Stock Pro - Full History Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --available: #2dd4bf; --unavailable: #fb7185; --repair: #fbbf24;
+            --primary: #6366f1; --glass: rgba(255, 255, 255, 0.7);
+            --glass-heavy: rgba(255, 255, 255, 0.85);
+        }
+
+        * { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            margin: 0; min-height: 100vh; display: flex; justify-content: center;
+            background: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&q=80&w=2070') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .bg-overlay { position: fixed; inset: 0; background: rgba(240, 249, 255, 0.1); backdrop-filter: brightness(0.95); z-index: -1; }
+
+        /* Login */
+        #loginPage { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(20px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+        .login-card { background: var(--glass-heavy); padding: 50px; border-radius: 30px; width: 420px; text-align: center; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 25px 50px rgba(0,0,0,0.2); }
+
+        /* Main System */
+        #mainSystem { display: none; width: 100%; max-width: 1200px; padding: 40px 20px; animation: fadeIn 0.8s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; } }
+        .container { background: var(--glass); backdrop-filter: blur(15px); padding: 40px; border-radius: 32px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+
+        /* Form Styling */
+        .form-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 35px; background: rgba(255,255,255,0.4); padding: 25px; border-radius: 24px; border: 1px solid rgba(255,255,255,0.5); align-items: end; }
+        input, select { padding: 12px; border: 1px solid rgba(255,255,255,0.6); border-radius: 12px; font-size: 13px; background: rgba(255,255,255,0.8); outline: none; width: 100%; }
+        
+        .btn-main { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2); }
+        .btn-main:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-table { border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.6); color: var(--primary); }
+        .btn-table:hover { background: var(--primary); color: white; }
+
+        /* Table & Image */
+        table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
+        td { padding: 15px; background: rgba(255,255,255,0.5); vertical-align: middle; }
+        td:first-child { border-radius: 18px 0 0 18px; }
+        td:last-child { border-radius: 0 18px 18px 0; }
+
+        .item-img { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; cursor: zoom-in; border: 2px solid white; background: #fff; }
+        .no-img { width: 60px; height: 60px; border-radius: 12px; background: #cbd5e1; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 10000; }
+        .modal { background: var(--glass-heavy); padding: 30px; border-radius: 25px; width: 420px; border: 1px solid white; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .list-item { display: flex; justify-content: space-between; padding: 10px; background: rgba(255,255,255,0.5); margin-bottom: 5px; border-radius: 10px; font-size: 14px; border: 1px solid rgba(0,0,0,0.05); }
+
+        /* History Log Box */
+        #logBox { background: rgba(255,255,255,0.4); border-radius: 24px; padding: 20px; max-height: 300px; overflow-y: auto; border: 1px solid rgba(255,255,255,0.5); }
+        .log-entry { padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.05); font-size: 13px; color: #475569; }
+    </style>
+</head>
+<body>
+
+<div class="bg-overlay"></div>
+
+<div id="loginPage">
+    <div class="login-card">
+        <h2 style="margin-top:0">❄️ Frost Stock Pro</h2>
+        <p style="color:#64748b; font-size:14px; margin-bottom:25px;">User: admin | Pass: 1234</p>
+        <input type="text" id="username" placeholder="Username" style="margin-bottom:10px;">
+        <input type="password" id="password" placeholder="Password" style="margin-bottom:20px;">
+        <button class="btn-main" onclick="handleLogin()" style="width: 100%;">เข้าสู่ระบบ</button>
+    </div>
+</div>
+
+<div id="mainSystem">
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; flex-wrap:wrap; gap:10px;">
+            <h2 style="margin:0; font-size: 26px; color: #1e293b;">Stock Control & History</h2>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-table" onclick="openManager('site')">🏗️ ไซต์งาน</button>
+                <button class="btn-table" onclick="openManager('type')">🏷️ ประเภทสินค้า</button>
+                <button class="btn-table" style="color:#f43f5e" onclick="location.reload()">ออก</button>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div><label style="font-size:11px; font-weight:600;">รหัส</label><input type="text" id="tCode" placeholder="รหัส"></div>
+            <div><label style="font-size:11px; font-weight:600;">ชื่อสินค้า</label><input type="text" id="tName" placeholder="ชื่อ"></div>
+            <div>
+                <label style="font-size:11px; font-weight:600;">ประเภท</label>
+                <select id="tTypeSelect"></select>
+            </div>
+            <div><label style="font-size:11px; font-weight:600;">รูปภาพ</label><input type="file" id="tImg" accept="image/*" style="padding:8px;"></div>
+            <div><label style="font-size:11px; font-weight:600;">จำนวน</label><input type="number" id="tQty" value="1"></div>
+            <button class="btn-main" onclick="addItem()">เพิ่มสินค้า</button>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr style="text-align:left; font-size:12px; color:#475569;">
+                        <th>รูป</th>
+                        <th>ข้อมูล</th>
+                        <th>ประเภท</th>
+                        <th>สถานะ</th>
+                        <th>คงเหลือ</th>
+                        <th style="text-align:right;">จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="toolTable"></tbody>
+            </table>
+        </div>
+
+        <div style="margin-top:50px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="margin:0; color: #1e293b;">📜 ประวัติกิจกรรมล่าสุด</h3>
+                <button class="btn-table" style="color:#f43f5e;" onclick="clearLogs()">ล้างประวัติ</button>
+            </div>
+            <div id="logBox">ไม่มีประวัติกิจกรรม</div>
+        </div>
+    </div>
+</div>
+
+<div id="listModal" class="modal-overlay">
+    <div class="modal">
+        <h3 id="listModalTitle">จัดการ</h3>
+        <div style="display:flex; gap:8px; margin-bottom:20px;">
+            <input type="text" id="newItemInput" placeholder="เพิ่มรายการใหม่" style="flex:1;">
+            <button class="btn-main" onclick="addNewListItem()" style="padding:10px 15px;">เพิ่ม</button>
+        </div>
+        <div id="listContainer" style="max-height:200px; overflow-y:auto; margin-bottom:20px;"></div>
+        <button class="btn-main" style="width:100%; background:#e2e8f0; color:#334155;" onclick="closeModal('listModal')">ปิด</button>
+    </div>
+</div>
+
+<div id="actionModal" class="modal-overlay">
+    <div class="modal">
+        <h3 id="actionModalTitle">เบิก/คืน</h3>
+        <input type="text" id="mUser" placeholder="ชื่อผู้ทำรายการ" style="margin-bottom:12px;">
+        <select id="mSiteSelect" style="margin-bottom:15px;"></select>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-main" style="flex:1; background:#e2e8f0; color:#334155;" onclick="closeModal('actionModal')">ยกเลิก</button>
+            <button id="confirmBtn" class="btn-main" style="flex:1;">ยืนยัน</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let tools = JSON.parse(localStorage.getItem('frostV6_Tools')) || [];
+    let sites = JSON.parse(localStorage.getItem('frostV6_Sites')) || ['สำนักงานใหญ่'];
+    let types = JSON.parse(localStorage.getItem('frostV6_Types')) || ['เครื่องมือไฟฟ้า', 'วัสดุก่อสร้าง', 'ทั่วไป'];
+    let logs = JSON.parse(localStorage.getItem('frostV6_Logs')) || [];
+    let currentMode = '';
+
+    function handleLogin() {
+        if(document.getElementById('username').value==='admin' && document.getElementById('password').value==='1234'){
+            document.getElementById('loginPage').style.display='none';
+            document.getElementById('mainSystem').style.display='block';
+            updateDropdowns(); render();
+        }
+    }
+
+    function updateDropdowns() {
+        document.getElementById('tTypeSelect').innerHTML = types.map(t => `<option value="${t}">${t}</option>`).join('');
+    }
+
+    // จัดการ List (Site/Type)
+    function openManager(mode) {
+        currentMode = mode;
+        document.getElementById('listModalTitle').innerText = mode === 'site' ? '🏗️ จัดการไซต์งาน' : '🏷️ จัดการประเภทสินค้า';
+        document.getElementById('listModal').style.display = 'flex';
+        renderList();
+    }
+    function renderList() {
+        const data = currentMode === 'site' ? sites : types;
+        document.getElementById('listContainer').innerHTML = data.map((item, i) => `
+            <div class="list-item">
+                <span>${item}</span>
+                <button onclick="deleteListItem(${i})" style="color:#f43f5e; border:none; background:none; cursor:pointer;">ลบ</button>
+            </div>`).join('');
+    }
+    function addNewListItem() {
+        const val = document.getElementById('newItemInput').value.trim();
+        if(!val) return;
+        if(currentMode === 'site') sites.push(val); else types.push(val);
+        document.getElementById('newItemInput').value = '';
+        saveLists(); renderList(); updateDropdowns();
+    }
+    function deleteListItem(i) {
+        if(currentMode === 'site') sites.splice(i, 1); else types.splice(i, 1);
+        saveLists(); renderList(); updateDropdowns();
+    }
+    function saveLists() {
+        localStorage.setItem('frostV6_Sites', JSON.stringify(sites));
+        localStorage.setItem('frostV6_Types', JSON.stringify(types));
+    }
+
+    // ระบบจัดการสินค้า
+    async function addItem() {
+        const id = document.getElementById('tCode').value;
+        const name = document.getElementById('tName').value;
+        const type = document.getElementById('tTypeSelect').value;
+        const qty = parseInt(document.getElementById('tQty').value);
+        const imgFile = document.getElementById('tImg').files[0];
+        let imgBase64 = imgFile ? await toBase64(imgFile) : "";
+
+        if (id && name && !isNaN(qty)) {
+            tools.push({ uid: Date.now(), id, name, type, qty, img: imgBase64 });
+            addLog(id, name, 'เพิ่มสินค้าใหม่', '-', '-');
+            saveAll();
+            ['tCode','tName','tQty','tImg'].forEach(id => document.getElementById(id).value = (id==='tQty'?1:''));
+        }
+    }
+
+    function openAction(uid, delta) {
+        const item = tools.find(t => t.uid === uid);
+        if(delta < 0 && item.qty <= 0) return alert('สินค้าหมดสต็อก!');
+        document.getElementById('mSiteSelect').innerHTML = sites.map(s => `<option value="${s}">${s}</option>`).join('');
+        document.getElementById('actionModal').style.display = 'flex';
+        document.getElementById('actionModalTitle').innerText = delta > 0 ? `คืนสินค้า: ${item.name}` : `เบิกสินค้า: ${item.name}`;
+        document.getElementById('confirmBtn').onclick = () => {
+            const user = document.getElementById('mUser').value || 'ไม่ระบุชื่อ';
+            const site = document.getElementById('mSiteSelect').value;
+            item.qty += delta;
+            addLog(item.id, item.name, delta > 0 ? 'คืนเข้า' : 'เบิกออก', user, site);
+            closeModal('actionModal'); saveAll();
+        };
+    }
+
+    function addLog(id, name, act, user, site) {
+        const now = new Date().toLocaleString('th-TH');
+        logs.unshift({ time: now, id, name, act, user, site });
+        if(logs.length > 50) logs.pop();
+    }
+
+    function clearLogs() { if(confirm('ล้างประวัติกิจกรรมทั้งหมด?')) { logs = []; saveAll(); } }
+
+    function render() {
+        // Render Table
+        const table = document.getElementById('toolTable');
+        table.innerHTML = tools.map(item => `
+            <tr>
+                <td>${item.img ? `<img src="${item.img}" class="item-img" onclick="window.open(this.src)">` : `<div class="no-img">📦</div>`}</td>
+                <td><b>${item.id}</b><br><small style="color:#64748b">${item.name}</small></td>
+                <td><span style="font-size:11px; background:rgba(99,102,241,0.1); padding:4px 8px; border-radius:8px; color:var(--primary); font-weight:600;">${item.type}</span></td>
+                <td><span style="color:${item.qty > 0 ? 'var(--available)' : 'var(--unavailable)'}; font-weight:600;">● ${item.qty > 0 ? 'พร้อม' : 'หมด'}</span></td>
+                <td><b>${item.qty}</b></td>
+                <td style="text-align:right;">
+                    <button class="btn-table" onclick="openAction(${item.uid}, -1)">เบิก</button>
+                    <button class="btn-table" onclick="openAction(${item.uid}, 1)" style="color:#10b981;">คืน</button>
+                    <button class="btn-table" style="color:#f43f5e" onclick="deleteTool(${item.uid})">ลบ</button>
+                </td>
+            </tr>`).join('');
+
+        // Render Logs
+        const logBox = document.getElementById('logBox');
+        logBox.innerHTML = logs.map(l => `
+            <div class="log-entry">
+                <span style="color:#94a3b8; font-family:monospace;">[${l.time}]</span> 
+                <b>${l.act}</b>: ${l.name} (${l.id}) 
+                <span style="color:var(--primary)">ไซต์: ${l.site}</span> | โดย: ${l.user}
+            </div>`).join('') || 'ไม่มีประวัติกิจกรรม';
+    }
+
+    const toBase64 = file => new Promise((r, j) => {
+        const rd = new FileReader(); rd.readAsDataURL(file);
+        rd.onload = () => r(rd.result); rd.onerror = e => j(e);
+    });
+
+    function deleteTool(uid) { 
+        if(confirm('ลบรายการนี้ออกจากสต็อก?')) { 
+            const item = tools.find(t => t.uid === uid);
+            addLog(item.id, item.name, 'ลบออกจากระบบ', '-', '-');
+            tools = tools.filter(t => t.uid !== uid); 
+            saveAll(); 
+        } 
+    }
+
+    function saveAll() {
+        localStorage.setItem('frostV6_Tools', JSON.stringify(tools));
+        localStorage.setItem('frostV6_Logs', JSON.stringify(logs));
+        render();
+    }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; document.getElementById('mUser').value = ''; }
+</script>
+</body>
+</html>
